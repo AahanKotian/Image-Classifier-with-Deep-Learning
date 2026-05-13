@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.so
+.Python
+venv/
+.venv/
+env/
+
+# TensorFlow / models
+model/saved/*.h5
+model/saved/*.pb
+model/saved/logs/
+model/saved/*.png
+model/saved/*.json
+!model/saved/.gitkeep
+
+# Data
+data/
+*.tfrecord
+*.npy
+*.npz
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+*.env
