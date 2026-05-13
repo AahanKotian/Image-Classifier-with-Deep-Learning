@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neural Vision — Image Classifier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <!-- ── Background grid ──────────────────────── -->
+  <div class="bg-grid"></div>
+  <div class="bg-noise"></div>
+
+  <!-- ── Header ───────────────────────────────── -->
+  <header>
+    <div class="logo">
+      <span class="logo-icon">◈</span>
+      <span class="logo-text">NEURAL<em>VISION</em></span>
+    </div>
+    <nav>
+      <span class="badge" id="model-badge">
+        <span class="dot"></span>
+        <span id="model-name">Loading model…</span>
+      </span>
+    </nav>
+  </header>
+
+  <!-- ── Hero ─────────────────────────────────── -->
+  <section class="hero">
+    <h1>Deep Learning<br /><em>Image Classifier</em></h1>
+    <p class="sub">
+      CNN trained on CIFAR-10 &amp; MNIST · Transfer learning with MobileNetV2<br />
+      Drop an image, get a prediction in &lt;20ms
+    </p>
+  </section>
+
+  <!-- ── Main classifier card ──────────────────── -->
+  <main>
+    <div class="card" id="classifier-card">
+
+      <!-- Drop zone -->
+      <div class="drop-zone" id="drop-zone">
+        <div class="drop-inner">
+          <div class="drop-icon">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="8" y="14" width="48" height="36" rx="4" stroke="currentColor" stroke-width="2.5"/>
+              <circle cx="22" cy="26" r="5" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M8 38 L20 27 L30 35 L40 24 L56 38" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M32 52 L32 44 M28 48 L32 44 L36 48" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="drop-label">Drop image here</p>
+          <p class="drop-sub">or</p>
+          <label class="btn-upload" for="file-input">Browse files</label>
+          <input type="file" id="file-input" accept="image/*" hidden />
+        </div>
+      </div>
+
+      <!-- Preview + results -->
+      <div class="results-area" id="results-area" hidden>
+
+        <div class="preview-wrap">
+          <img id="preview-img" src="" alt="Preview" />
+          <button class="btn-clear" id="btn-clear" title="Clear">✕</button>
+        </div>
+
+        <div class="results-wrap">
+          <!-- Status / spinner -->
+          <div class="status" id="status">
+            <span class="spinner"></span>
+            <span id="status-text">Classifying…</span>
+          </div>
+
+          <!-- Prediction -->
+          <div class="prediction" id="prediction-block" hidden>
+            <div class="pred-label">Prediction</div>
+            <div class="pred-class" id="pred-class">—</div>
+            <div class="pred-conf" id="pred-conf">—</div>
+          </div>
+
+          <!-- Top-K bar chart -->
+          <div class="topk" id="topk-block" hidden>
+            <div class="topk-label">Top predictions</div>
+            <div class="topk-bars" id="topk-bars"></div>
+          </div>
+
+          <!-- Meta -->
+          <div class="meta" id="meta-block" hidden>
+            <span id="meta-time"></span>
+            <span id="meta-demo"></span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.card -->
+
+    <!-- ── Architecture diagram ──────────────── -->
+    <div class="arch-card">
+      <h2 class="arch-title">Model Architecture</h2>
+      <div class="arch-flow">
+        <div class="arch-layer input">Input<span>32×32×3</span></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-layer conv">Conv2D<span>×3 blocks</span></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-layer pool">MaxPool<span>+BN</span></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-layer gap">GAP<span>Global</span></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-layer dense">Dense<span>256</span></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-layer out">Softmax<span id="arch-classes">10</span></div>
+      </div>
+      <div class="arch-tags">
+        <span class="tag">BatchNorm</span>
+        <span class="tag">Dropout 0.4</span>
+        <span class="tag">Data Augmentation</span>
+        <span class="tag">Adam Optimizer</span>
+      </div>
+    </div>
+
+    <!-- ── Stats row ─────────────────────────── -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-acc">—</div>
+        <div class="stat-lbl">Test Accuracy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-classes">—</div>
+        <div class="stat-lbl">Classes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">&lt;20ms</div>
+        <div class="stat-lbl">Inference Time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">2.3M</div>
+        <div class="stat-lbl">Parameters</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Footer ───────────────────────────────── -->
+  <footer>
+    <p>Built with TensorFlow · Flask · Love &nbsp;|&nbsp;
+      <a href="https://github.com/yourusername/image-classifier">View on GitHub →</a>
+    </p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/classifier.js') }}"></script>
+</body>
+</html>
